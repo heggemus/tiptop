@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rbsc
+spec:
+  selector:
+    matchLabels:
+      app: rbsc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rbsc
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.8-management
+        ports:
+          - containerPort: 5671
+          - containerPort: 15671
+            name: rabbitmq
+            protocol: TCP        
+      - name: sidecar
+        image: alpine
+        volumeMounts:
+        - name: opt
+          mountPath: /mnt/opt    
+      volumes:
+      - name: opt
+        azureFile:
+          secretName: tiptop-pvc-secret
+          shareName: opt
+          readOnly: false

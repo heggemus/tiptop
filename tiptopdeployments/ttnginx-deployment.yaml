@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ttnginx
+  labels:
+    app: ttnginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ttnginx
+  template:
+    metadata:
+      labels:
+        app: ttnginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        # - name: tiptopvolumeconf
+        - name: ttnginx-default-conf
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: ttnginx-default-conf
+        configMap:
+          name: ttnginx-default-conf
+        # azureFile:
+        #   secretName: tiptop-pvc-secret
+        #   shareName: confd
+        #   readOnly: false 

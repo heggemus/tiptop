@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tiptopservicesapi
+  labels:
+    app: tiptopservicesapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tiptopservicesapi
+  template:
+    metadata:
+      labels:
+        app: tiptopservicesapi
+    spec:
+      hostAliases:
+      - ip: "10.11.30.133"
+        hostnames:
+        - "swnc7r1208"
+      - ip: "10.29.226.9"
+        hostnames:
+        - "account.routit.nl"
+      - ip: "10.75.244.55"
+        hostnames:
+        - "suppliers.routit.nl"
+      containers:
+      - name: tiptopservicesapi
+        image: k8sregistry.duckdns.org/kpntiptopservicesapi:prdv1.2
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: "1"
+        command: ["dotnet"]
+        args: ["KPN.TipTop.Services.API.dll"]
+        workingDir: /app
+        ports:
+        - containerPort: 51669
+        - containerPort: 44369
+        - containerPort: 80
+        - containerPort: 443
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Production
+        - name: ASPNETCORE_HTTPS_PORT
+          value: "44369"
+        - name: ASPNETCORE_Kestrel__Certificates__Default__Password
+          # value: 1f3cff73-5e47-4163-ba37-bf2526f2efc0
+          value: changeit          
+        - name: ASPNETCORE_Kestrel__Certificates__Default__Path
+          value: /root/.aspnet/https/tiptop-api.kpn.org.pfx
+        - name: ASPNETCORE_URLS
+          value: https://+:443;http://+:80
+        - name: ApiKey
+          value: 6361e948-96eb-4e7e-b4d2-8a75124f519b
+        - name: ConnectionStrings__RabbitMQConnection
+          value: host=rabbitmq
+        - name: InetnumAssignmentReceiveTimeOutHours
+          value: "0"
+        - name: InetnumAssignmentReceiveTimeOutHoursV3
+          value: "0"                    
+        - name: InetnumAssignmentReceiveTimeOutMinutes
+          value: "10"
+        - name: InetnumAssignmentSendTimeOutSeconds
+          value: "0"
+        - name: InetnumAssignmentReceiveTimeOutSecondsV3
+          value: "0"
+        - name: InetnumAssignmentSendTimeOutHours
+          value: "0"
+        - name: InetnumAssignmentSendTimeOutHoursV3
+          value: "0"
+        - name: InetnumAssignmentSendTimeOutMinutes
+          value: "10"
+        - name: InetnumAssignmentSendTimeOutMinutesV3
+          value: "10"
+        - name: InetnumAssignmentSendTimeOutSeconds
+          value: "0"
+        - name: InetnumAssignmentSendTimeOutSecondsV3
+          value: "0"             
+        - name: InetnumAssignmentUrl
+          value: "http://swnc7r1208/Services/TipTopV2/Inetnum.svc"
+        - name: InetnumAssignmentUrlV3
+          value: "http://swnc7r1208/Services/TipTopV2/InetnumV3.svc"
+        - name: PersonServiceReceiveTimeOutHours
+          value: "0"
+        - name: PersonServiceReceiveTimeOutMinutes
+          value: "10"
+        - name: PersonServiceReceiveTimeOutSeconds
+          value: "0"
+        - name: PersonServiceSendTimeOutHours
+          value: "0"
+        - name: PersonServiceSendTimeOutMinutes
+          value: "10"
+        - name: PersonServiceSendTimeOutSeconds
+          value: "0"
+        - name: PersonServiceUrl
+          value: "http://swnc7r1208/Services/TipTopV2/PersonRole.svc"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: PATH
+          value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        volumeMounts:
+        - name: app
+          mountPath: /app
+        - name: dataprotection-keys
+          mountPath: /root/.aspnet/DataProtection-Keys
+        - name: https
+          mountPath: /root/.aspnet/https 
+        - name: usersecrets
+          mountPath: /root/.microsoft/usersecrets
+        - name: netcoreapp31
+          mountPath: /netcoreapp3.1
+      volumes:
+      - name: app
+        azureFile:
+          secretName: tiptop-pvc-secret
+          shareName: app
+          readOnly: false 
+      - name: dataprotection-keys
+        azureFile:
+          secretName: tiptop-pvc-secret
+          shareName: dataprotection-keys
+          readOnly: false
+      # - name: dataprotection-keys
+      #   configMap:
+      #     name: dataprotection-keys
+      - name: https
+        configMap:
+          name: https
+        # azureFile:
+        #   secretName: tiptop-pvc-secret
+        #   shareName: https
+      - name: usersecrets
+        configMap:
+          name: usersecrets
+        # azureFile:
+        #   secretName: tiptop-pvc-secret
+        #   shareName: usersecrets
+        #   readOnly: false
+      - name: netcoreapp31
+        azureFile:
+          secretName: tiptop-pvc-secret
+          shareName: netcoreapp31
+          readOnly: false    
+                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

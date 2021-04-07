@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    app: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        resources:
+          limits:
+            memory: 2Gi
+            cpu: 1
+        ports:
+        - containerPort: 1433
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          value: FourICTMalaz@Password
+        - name: PATH
+          value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin  
+        volumeMounts:
+        - name: dbdata
+          mountPath: /var/opt/mssql/data
+      volumes:
+      - name: dbdata
+        azureFile:
+          secretName: tiptop-pvc-secret
+          shareName: dbdata
+          readOnly: false 

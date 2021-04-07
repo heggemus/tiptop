@@ -1,0 +1,54 @@
+version: '3.3'
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+#     volumes:
+#       - ./nginx_data/conf.d:/etc/nginx/conf.d
+#       - ./nginx/basic_auth:/etc/nginx/basic_auth
+    ports:
+      - 80:80/tcp
+# #     - 443:443/tcp
+#   db:
+#     env_file:
+#       - db.env
+#     image: mcr.microsoft.com/mssql/server:latest
+#     container_name: tt_db
+#     ports:
+#       - "1433:1433"
+#     volumes:
+#     - ./db_data:/var/opt/mssql/data
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: tt_rabbitmq
+    hostname: rabbitmq
+#    depends_on:
+#      - nginx
+#   kpn.tiptop.services.api:
+#     links:
+#       - db
+#       - rabbitmq
+#     depends_on:
+#       - db
+#       - rabbitmq
+#     env_file:
+#       - api.env
+#     container_name: tt_app
+#     build: .
+#     image: tiptopapp.azurecr.io/kpntiptopservicesapi:01
+#     volumes:
+#     - ./api_data/UserSecrets:/root/.microsoft/usersecrets
+#     - ./api_data/Https:/root/.aspnet/https
+#     - ./api_data/DataProtection-Keys:/root/.aspnet/DataProtection-Keys
+#     - ./api_data/App:/app
+#     ports:
+#       - "51169:80"
+#       - "443:443"
+#     command:
+#      - /opt/mssql/bin/nonroot_msg.sh /opt/mssql/bin/sqlservr
+#      - tail -f /dev/null
+#     restart: on-failure
